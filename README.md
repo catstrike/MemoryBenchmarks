@@ -2,5 +2,7 @@
 
 To run Writing Test:
 ```
-$ gcc -o WritingTest WritingTest.c && ./WritingTest
+$ make WritingTest && ./WritingTest
+
+$ make AlignmentTest && ./AlignmentTest
 ```

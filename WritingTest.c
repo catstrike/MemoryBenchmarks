@@ -4,10 +4,11 @@
 //
 
 #include <time.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+
+#include "platform/threads.h"
 
 #define CacheLineSize 64
 #define CacheSize 4194304
@@ -18,28 +19,6 @@ typedef struct {
     int64_t * buffer;
     size_t count;
 } TaskParameters;
-
-typedef void *(*ThreadStart) (void *);
-
-int startThread(pthread_t * thread, ThreadStart start, void * parameters)
-{
-    pthread_attr_t attributes;
-
-    int result;
-
-    if ((result = pthread_attr_init(&attributes)) != 0) {
-        return result;
-    }
-
-    if ((result = pthread_create(thread, &attributes, start, parameters)) != 0) {
-        pthread_attr_destroy(&attributes);
-        return result;
-    }
-
-    pthread_attr_destroy(&attributes);
-
-    return result;
-}
 
 void reportElapsedTime(const char * tag, clock_t start, clock_t stop)
 {
@@ -84,7 +63,7 @@ clock_t WorkFast(int64_t* buffer, size_t count)
     return stop - start;
 }
 
-void * FastWorker(void * rawParameters)
+thread_ret_value FastWorker(void * rawParameters)
 {
     TaskParameters * parameters = (TaskParameters *)rawParameters;
 
@@ -95,7 +74,7 @@ void * FastWorker(void * rawParameters)
         buffer[i] = count - i;
     }
 
-    return NULL;
+    END_THREAD;
 }
 
 clock_t WorkFastThreaded(int64_t* buffer, size_t count)
@@ -109,7 +88,7 @@ clock_t WorkFastThreaded(int64_t* buffer, size_t count)
         parameter->buffer = buffer + countPerChunk * i;
         parameter->count = countPerChunk;
 
-        if ((errno = startThread(&threads[i], FastWorker, parameter)) != 0) {
+        if ((errno = start_thread(&threads[i], FastWorker, parameter)) != 0) {
             perror("Error!");
             printf("Can't start thread!\n");
         }
@@ -118,7 +97,7 @@ clock_t WorkFastThreaded(int64_t* buffer, size_t count)
     clock_t start = clock();
 
     for (size_t i = 0; i < ThreadsCount; i += 1) {
-        pthread_join(threads[i], NULL);
+        join_thread(threads[i]);
     }
 
     clock_t stop = clock();
