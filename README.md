@@ -7,7 +7,7 @@ $ make
 
 To run Writing Test:
 ```
-$ make writing
+$ ./writing
 ```
 
 To run Alignment Test with proper alignment and without locks:
