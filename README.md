@@ -1,11 +1,26 @@
 # MemoryBenchmarks
 
-To run Writing Test:
+First you need to build the project
 ```
-$ make WritingTest && ./WritingTest
+$ make
 ```
 
-To run Alignment Test:
+To run Writing Test:
 ```
-$ make AlignmentTest && ./AlignmentTest
+$ make writing
+```
+
+To run Alignment Test with proper alignment and without locks:
+```
+$ ./crw
+```
+
+To run Alignment Test unaligned without locks:
+```
+$ ./crw_unaligned
+```
+
+To run Alignment Test unaligned with locks:
+```
+$ ./crw_unaligned_locked
 ```

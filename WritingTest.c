@@ -9,6 +9,7 @@
 #include <errno.h>
 
 #include "platform/threads.h"
+#include "utility/benchmark.h"
 
 #define CacheLineSize 64
 #define CacheSize 4194304
@@ -19,12 +20,6 @@ typedef struct {
     int64_t * buffer;
     size_t count;
 } TaskParameters;
-
-void reportElapsedTime(const char * tag, clock_t start, clock_t stop)
-{
-    double elapsed = (double)(stop - start) * 1000.0 / CLOCKS_PER_SEC;
-    printf("%s: %.2f ms\n", tag, elapsed);
-}
 
 clock_t WorkHard(int64_t* buffer, size_t count)
 {
@@ -43,7 +38,7 @@ clock_t WorkHard(int64_t* buffer, size_t count)
 
     clock_t stop = clock();
 
-    reportElapsedTime("Hard", start, stop);
+    report_elapsed_time("Hard", start, stop);
 
     return stop - start;
 }
@@ -58,7 +53,7 @@ clock_t WorkFast(int64_t* buffer, size_t count)
 
     clock_t stop = clock();
 
-    reportElapsedTime("Fast", start, stop);
+    report_elapsed_time("Fast", start, stop);
 
     return stop - start;
 }
@@ -102,7 +97,7 @@ clock_t WorkFastThreaded(int64_t* buffer, size_t count)
 
     clock_t stop = clock();
 
-    reportElapsedTime("Fast (threaded)", start, stop);
+    report_elapsed_time("Fast (threaded)", start, stop);
 
     return stop - start;
 }
@@ -132,7 +127,7 @@ int main(int argc, const char * argv[])
     clock_t stop = clock();
 
     printf("-------------------------------------------------------\n");
-    reportElapsedTime("Total", start, stop);
+    report_elapsed_time("Total", start, stop);
 
     double percent = (1.0 - (double)fastTime / hardTime) * 100;
     double percentThreaded = (1.0 - (double)fastTimeThreaded / hardTime) * 100;
