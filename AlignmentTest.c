@@ -83,8 +83,15 @@ int main(int argc, const char * argv[])
     size_t l2cacheSize;
     size_t cacheLineSize;
 
-    get_l2cache_size(&l2cacheSize);
-    get_cache_line_size(&cacheLineSize);
+    if (0 != get_l2cache_size(&l2cacheSize)) {
+        printf("Can't get the L2 cache size!");
+        return 1;
+    }
+
+    if (0 != get_cache_line_size(&cacheLineSize)) {
+        printf("Can't get the cache line size!");
+        return 1;
+    }
 
     printf("=======================================================\n");
     printf("L2 cache size: %zu, line size: %zu, total lines: %zu\n",
@@ -108,9 +115,9 @@ int main(int argc, const char * argv[])
     void * beginningOfLine = buffer + cacheLineSize;
     volatile int64_t * variable = (int64_t*)(beginningOfLine + Offset);
 
-    printf("Base address:      %zu\n", (size_t)buffer);
-    printf("Beginning of line: %zu\n", (size_t)beginningOfLine);
-    printf("Variable address:  %zu\n", (size_t)variable);
+    printf("Base address:            %zu\n", (size_t)buffer);
+    printf("Beginning of the line:   %zu\n", (size_t)beginningOfLine);
+    printf("Address of the variable: %zu\n", (size_t)variable);
 
     thread_type readerThread;
     thread_type writerThread;
@@ -129,7 +136,7 @@ int main(int argc, const char * argv[])
     join_thread(readerThread);
     join_thread(writerThread);
 
-    printf("Broken values: %lli\n", parameters.brokenValues);
+    printf("Broken values count: %lli\n", parameters.brokenValues);
 
     free(buffer);
 
