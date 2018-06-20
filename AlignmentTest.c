@@ -10,11 +10,8 @@
 
 #include "platform/threads.h"
 #include "platform/atomic.h"
+#include "platform/memory.h"
 #include "utility/benchmark.h"
-
-#define CacheLineSize 64
-#define CacheSize 4194304
-#define CacheLines (CacheSize / CacheLineSize)
 
 #ifdef UNALIGNED
 #define Offset -3
@@ -83,11 +80,17 @@ thread_ret_value reader(void * rawParameters)
 
 int main(int argc, const char * argv[])
 {
+    size_t l2cacheSize;
+    size_t cacheLineSize;
+
+    get_l2cache_size(&l2cacheSize);
+    get_cache_line_size(&cacheLineSize);
+
     printf("=======================================================\n");
-    printf("Cache size: %i, line size: %i, total lines: %i\n",
-       CacheSize,
-       CacheLineSize,
-       CacheLines
+    printf("L2 cache size: %zu, line size: %zu, total lines: %zu\n",
+       l2cacheSize,
+       cacheLineSize,
+       l2cacheSize / cacheLineSize
     );
 
     printf("Flags: ");
@@ -101,13 +104,12 @@ int main(int argc, const char * argv[])
 
     printf("\n");
 
-    void * buffer = malloc(CacheLineSize * 2);
-
-    size_t beginningOfLine = ((size_t)buffer + CacheLineSize + 1) / CacheLineSize * CacheLineSize;
+    void * buffer = aligned_malloc(cacheLineSize * 2, cacheLineSize);
+    void * beginningOfLine = buffer + cacheLineSize;
     volatile int64_t * variable = (int64_t*)(beginningOfLine + Offset);
 
     printf("Base address:      %zu\n", (size_t)buffer);
-    printf("Beginning of line: %zu\n", beginningOfLine);
+    printf("Beginning of line: %zu\n", (size_t)beginningOfLine);
     printf("Variable address:  %zu\n", (size_t)variable);
 
     thread_type readerThread;

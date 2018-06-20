@@ -1,4 +1,6 @@
-# MemoryBenchmarks
+# Memory Benchmarks
+
+Benchmarks work only for Mac at this point. I'm going to add Windows and Linux soon.
 
 First you need to build the project
 ```

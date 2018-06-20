@@ -1,6 +1,7 @@
 WritingTestFiles = WritingTest.c platform/threads.c utility/benchmark.c
 
 AlignmentTestFiles = AlignmentTest.c platform/threads.c platform/atomic.c utility/benchmark.c
+AlignmentTestFiles += platform/memory.c
 
 all: writing crw crw_unaligned crw_unaligned_locked
 
